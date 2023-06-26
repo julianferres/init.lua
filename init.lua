@@ -9,7 +9,8 @@ vim.opt.wildmenu = true -- visual autocomplete for command menu
 vim.opt.lazyredraw = true -- redraw screen only when we need to
 vim.opt.showmatch = true -- highlight matching parentheses / brackets [{()}]
 vim.opt.visualbell = false -- disable visual bell
-vim.opt.signcolumn = "no" -- show line number on statusline
+--vim.opt.signcolumn = "no" -- show line number on statusline
+vim.opt.signcolumn = "yes:1" -- show sings on the left of the number, as much as possible symbols
 vim.opt.wrap = false -- avoid wrapping lines
 vim.opt.swapfile = false -- disable swapfile
 vim.opt.ttyfast = true -- Avoid Ctrl-S freezing the terminal
@@ -38,6 +39,10 @@ vim.keymap.set("n", "<CR>", ":noh<CR><CR>")
 vim.keymap.set("n", "<leader><leader>", "<C-^>")
 -- Close current buffer
 vim.keymap.set("n", "<leader>q", "<Esc>:bd<CR>")
+-- Next buffer 
+vim.keymap.set("n", "<A-j>", "<Esc>:bn<CR>")
+-- Previous buffer
+vim.keymap.set("n", "<A-k>", "<Esc>:bp<CR>")
 -- Toggle wrap
 vim.keymap.set("n", "<A-z>", "<Esc>:set wrap!<CR>")
 -- Join lines without space between
@@ -71,6 +76,8 @@ vim.cmd("colorscheme tokyonight-moon")
 require('lualine').setup {
     options = { theme = 'auto' },
 }
+vim.opt.termguicolors = true
+require("bufferline").setup {}
 
 -- Plugin configs and mapppings --
 
@@ -90,6 +97,8 @@ require'FTerm'.setup({
 })
 vim.keymap.set('n', '<F12>', '<CMD>lua require("FTerm").toggle()<CR>')
 vim.keymap.set('t', '<F12>', '<C-\\><C-n><CMD>lua require("FTerm").toggle()<CR>')
+
+
 -- LSP zero
 local lsp = require('lsp-zero')
 local cmp = require('cmp')
@@ -105,10 +114,14 @@ lsp.setup_nvim_cmp({
           }), {"i", "c"}),
   })
 })
+
 lsp.setup()
-vim.diagnostic.config({ -- Inline errors
-  virtual_text = true
-})
+
+--vim.o.updatetime = 250
+--vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
+--vim.diagnostic.config({ -- Inline errors
+  --virtual_text = true
+--})
 -- Mason 'marketplace' for lsp servers
 require("mason").setup({
     ui = {

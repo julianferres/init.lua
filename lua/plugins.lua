@@ -33,16 +33,8 @@ return require('packer').startup(function(use)
     use 'tpope/vim-repeat'        -- Smarter . (dot) functionality
     use 'tpope/vim-surround'      -- Management of open-close pairs of ([{< etc.
     use 'tpope/vim-unimpaired'    -- ]p ]<Space> and ]b useful commands
-    use {
-        "zbirenbaum/copilot.lua",
-        cmd = "Copilot",
-        event = "InsertEnter",
-        config = function()
-            require("copilot").setup({})
-        end,
-    }
-    use 'numToStr/FTerm.nvim' -- Floating terminal
-    use 'lervag/vimtex'       -- Latex support
+    use 'numToStr/FTerm.nvim'     -- Floating terminal
+    use 'lervag/vimtex'           -- Latex support
     -- LSP
     use {
         'VonHeikemen/lsp-zero.nvim',

@@ -51,7 +51,6 @@ vim.keymap.set("n", "J", "gJ")
 vim.keymap.set("n", "<leader>r", "<Esc>:luafile %<CR>")
 -- Load git diff
 vim.keymap.set("n", "<leader>gd", "<Esc>:Gitsigns toggle_word_diff<CR>")
-
 -- Tabs and indents
 vim.opt.tabstop = 4               -- number of spaces that a <TAB> counts for
 vim.opt.shiftwidth = 4            -- number of spaces to use for each step of (auto)indent
@@ -71,20 +70,19 @@ vim.opt.cursorline = true         -- highlight current line
 vim.opt.background = "dark"       -- configure Vim to use darker colors
 vim.opt.autoread = true           -- autoreload the file in Vim if it has been changed outside of Vim
 vim.opt.clipboard = "unnamedplus" -- link global clipboard
--- Competitive programming compile autocmd
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = "cpp",
-    command =
-    "autocmd filetype cpp nnoremap <F9> :w <bar> ! g++ -std=c++17 -DLOCAL -Wall -g -O2 -Wconversion -Wshadow -Wextra % -o %:r<CR>"
-})
 
 -- Colorscheme --
 vim.cmd.colorscheme "catppuccin"
 require('lualine').setup {
-    options = { theme = 'auto' },
+    options = {
+        theme = 'auto',
+        section_separators = '',
+        component_separators = '|'
+    },
 }
+
 vim.opt.termguicolors = true
-require("bufferline").setup {}
+require("bufferline").setup()
 
 -- Plugin configs and mapppings --
 
@@ -104,8 +102,6 @@ require 'FTerm'.setup({
 })
 vim.keymap.set('n', '<F12>', '<CMD>lua require("FTerm").toggle()<CR>')
 vim.keymap.set('t', '<F12>', '<C-\\><C-n><CMD>lua require("FTerm").toggle()<CR>')
-
-
 -- LSP zero
 local lsp = require('lsp-zero')
 local cmp = require('cmp')
@@ -122,7 +118,6 @@ lsp.setup_nvim_cmp({
     })
 })
 
-
 lsp.format_on_save({
     format_opts = {
         async = false,
@@ -131,21 +126,19 @@ lsp.format_on_save({
     servers = {
         ['lua_ls'] = { 'lua' },
         ['rust_analyzer'] = { 'rust' },
-        -- if you have a working setup with null-ls
-        -- you can specify filetypes it can format.
-        -- ['null-ls'] = {'javascript', 'typescript'},
     }
 })
-
-lsp.setup()
-
-require('gitsigns').setup()
 
 --vim.o.updatetime = 250
 --vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
 --vim.diagnostic.config({ -- Inline errors
 --virtual_text = true
 --})
+
+lsp.setup()
+
+-- Gitsigns
+require('gitsigns').setup()
 -- Mason 'marketplace' for lsp servers
 require("mason").setup({
     ui = {
@@ -157,6 +150,7 @@ require("mason").setup({
     }
 })
 
+-- Marks
 require('marks').setup {
     -- whether to map keybinds or not. default true
     default_mappings = true,
@@ -190,4 +184,17 @@ require('marks').setup {
         annotate = false,
     },
     mappings = {}
+}
+
+-- Treesiter
+require 'nvim-treesitter.configs'.setup {
+    highlight = {
+        enable = true,
+        disable = {},
+        additional_vim_regex_highlighting = true, -- highlight also in vim's regexes:
+    },
+    indent = {
+        enable = true,
+        disable = {},
+    },
 }

@@ -1,4 +1,3 @@
--- Vim settings --
 require("plugins")
 
 -- General editor settings --

@@ -1,3 +1,4 @@
+-- Vim settings --
 require("plugins")
 
 -- General editor settings --
@@ -39,10 +40,13 @@ vim.keymap.set("n", "<CR>", ":noh<CR><CR>")
 vim.keymap.set("n", "<leader><leader>", "<C-^>")
 -- Close current buffer
 vim.keymap.set("n", "<leader>q", "<Esc>:bd<CR>")
+vim.keymap.set("n", "<A-q>", "<Esc>:bd<CR>")
 -- Next buffer
 vim.keymap.set("n", "<A-j>", "<Esc>:bn<CR>")
 -- Previous buffer
 vim.keymap.set("n", "<A-k>", "<Esc>:bp<CR>")
+-- New buffer
+vim.keymap.set("n", "<A-n>", ":enew<CR>")
 -- Toggle wrap
 vim.keymap.set("n", "<A-z>", "<Esc>:set wrap!<CR>")
 -- Join lines without space between
@@ -89,7 +93,16 @@ require("bufferline").setup()
 -- NERDTree and Undotree
 vim.keymap.set("n", "<F6>", ":NERDTreeToggle<CR>")  -- toggle NERDTree
 vim.keymap.set("n", "<F10>", ":UndotreeToggle<CR>") -- toggle Undotree
+vim.cmd [[ let NERDTreeShowHidden = 1 ]]
+
 -- Telescope
+require('telescope').setup {
+    pickers = {
+        find_files = {
+            hidden = true
+        }
+    }
+}
 local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<C-p>', builtin.find_files, {})
 vim.keymap.set('n', '<C-t>', builtin.live_grep, {})
@@ -107,16 +120,16 @@ local lsp = require('lsp-zero')
 local cmp = require('cmp')
 
 lsp.preset('recommended')
-lsp.setup_nvim_cmp({
-    mapping = cmp.mapping.preset.insert({
-        ['<Tab>'] = vim.NIL,
-        ['<S-Tab>'] = vim.NIL,
-        ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-        ["<C-Space>"] = cmp.mapping(cmp.mapping.complete({
-            reason = cmp.ContextReason.Auto,
-        }), { "i", "c" }),
-    })
-})
+--lsp.setup_nvim_cmp({
+--mapping = cmp.mapping.preset.insert({
+--['<Tab>'] = vim.NIL,
+--['<S-Tab>'] = vim.NIL,
+--['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+--["<C-Space>"] = cmp.mapping(cmp.mapping.complete({
+--reason = cmp.ContextReason.Auto,
+--}), { "i", "c" }),
+--})
+--})
 
 lsp.format_on_save({
     format_opts = {
@@ -129,12 +142,28 @@ lsp.format_on_save({
     }
 })
 
---vim.o.updatetime = 250
---vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
---vim.diagnostic.config({ -- Inline errors
---virtual_text = true
---})
 
+-- Fix Undefined global 'vim'
+lsp.configure('lua_ls', {
+    cmd = { 'lua-language-server' },
+    settings = {
+        Lua = {
+            runtime = {
+                version = 'LuaJIT',
+                path = vim.split(package.path, ';'),
+            },
+            diagnostics = {
+                globals = { 'vim' },
+            },
+            workspace = {
+                library = {
+                    [vim.fn.expand('$VIMRUNTIME/lua')] = true,
+                    [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
+                },
+            },
+        },
+    },
+})
 lsp.setup()
 
 -- Gitsigns
@@ -188,6 +217,7 @@ require('marks').setup {
 
 -- Treesiter
 require 'nvim-treesitter.configs'.setup {
+    ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "rust", "python", "typescript", "tsx", "cpp" },
     highlight = {
         enable = true,
         disable = {},
@@ -198,3 +228,17 @@ require 'nvim-treesitter.configs'.setup {
         disable = {},
     },
 }
+
+-- Rust-tools
+local rt = require("rust-tools")
+
+rt.setup({
+    server = {
+        on_attach = function(_, bufnr)
+            -- Hover actions
+            vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+            -- Code action groups
+            vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+        end,
+    },
+})
